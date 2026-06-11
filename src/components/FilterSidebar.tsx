@@ -17,7 +17,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ open, onClose, fil
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-          setArchetypes(data.map((a: any) => a.archetype_name));
+          setArchetypes(data.map((a: { archetype_name: string }) => a.archetype_name));
         }
       })
       .catch(err => console.error('Failed to fetch archetypes', err));

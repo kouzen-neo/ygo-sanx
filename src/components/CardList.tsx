@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Grid, Container, Typography, TextField, InputAdornment, Button, Box, CircularProgress } from '@mui/material';
-import { Search } from 'lucide-react';
+import { Grid, Container, Typography, TextField, InputAdornment, Button, Box, CircularProgress, IconButton } from '@mui/material';
+import { Search, Menu } from 'lucide-react';
 import { YgoCard } from './YgoCard';
 import { CardDetailsModal } from './CardDetailsModal';
+import { FilterSidebar } from './FilterSidebar';
 import type { YgoCardData } from '../types';
 
 export const CardList: React.FC = () => {
@@ -12,10 +13,19 @@ export const CardList: React.FC = () => {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [selectedCard, setSelectedCard] = useState<YgoCardData | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<{ archetype: string | null; type: string | null }>({
+    archetype: null,
+    type: null,
+  });
   
   const limit = 20;
 
-  const fetchCards = useCallback(async (reset: boolean = false, currentSearch: string = '') => {
+  const fetchCards = useCallback(async (
+    reset: boolean = false, 
+    currentSearch: string = '', 
+    filters = activeFilters
+  ) => {
     setLoading(true);
     try {
       const currentOffset = reset ? 0 : offset;
@@ -23,6 +33,14 @@ export const CardList: React.FC = () => {
       
       if (currentSearch) {
         url += `&fname=${encodeURIComponent(currentSearch)}`;
+      }
+
+      if (filters.archetype) {
+        url += `&archetype=${encodeURIComponent(filters.archetype)}`;
+      }
+
+      if (filters.type) {
+        url += `&type=${encodeURIComponent(filters.type)}`;
       }
 
       const res = await fetch(url);
@@ -42,11 +60,14 @@ export const CardList: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [offset]);
+  }, [offset, activeFilters]);
 
   // Initial load
   useEffect(() => {
-    fetchCards(true, '');
+    const timer = setTimeout(() => {
+      fetchCards(true, '');
+    }, 0);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -58,9 +79,14 @@ export const CardList: React.FC = () => {
   return (
     <Container sx={{ py: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
-        <Typography variant="h4" component="h1" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
-          Yu-Gi-Oh! Explorer
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: { xs: '100%', md: 'auto' } }}>
+          <IconButton onClick={() => setIsSidebarOpen(true)} color="primary">
+            <Menu />
+          </IconButton>
+          <Typography variant="h4" component="h1" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+            Yu-Gi-Oh! Explorer
+          </Typography>
+        </Box>
         <Box component="form" onSubmit={handleSearch} sx={{ width: { xs: '100%', md: '400px' } }}>
           <TextField
             fullWidth
@@ -81,9 +107,9 @@ export const CardList: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={1}>
         {cards.map(card => (
-          <Grid key={card.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+          <Grid key={card.id} size={{ xs: 6, sm: 4, md: 3, lg: 2.4 }}>
             <YgoCard card={card} onClick={setSelectedCard} />
           </Grid>
         ))}
@@ -110,6 +136,16 @@ export const CardList: React.FC = () => {
       )}
 
       <CardDetailsModal card={selectedCard} onClose={() => setSelectedCard(null)} />
+      
+      <FilterSidebar 
+        open={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+        filters={activeFilters}
+        onFilterChange={(newFilters) => {
+          setActiveFilters(newFilters);
+          fetchCards(true, searchTerm, newFilters);
+        }}
+      />
     </Container>
   );
 };

@@ -18,7 +18,7 @@ export const inkAndSteelTheme = createTheme({
   components: {
     MuiButton: {
       styleOverrides: {
-        root: ({ ownerState }: { ownerState: any }) => ({
+        root: ({ ownerState }: { ownerState: { variant?: string; color?: string } }) => ({
           borderRadius: 0,
           textTransform: 'none',
           fontWeight: 700,
