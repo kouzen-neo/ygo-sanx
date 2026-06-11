@@ -18,7 +18,7 @@ export const CardList: React.FC = () => {
       <Grid container spacing={3}>
         {cards.map(card => (
           <Grid key={card.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-            <YgoCard card={card} />
+            <YgoCard card={card} onClick={(c) => console.log('Clicked card:', c.name)} />
           </Grid>
         ))}
       </Grid>
