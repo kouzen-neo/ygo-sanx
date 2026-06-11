@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardMedia, CardContent, Typography, CircularProgress, Box } from '@mui/material';
 import { supabase } from '../supabaseClient';
+import type { YgoCardData } from '../types';
 
 interface YgoCardProps {
-  card: {
-    id: number;
-    name: string;
-    type: string;
-  };
+  card: YgoCardData;
 }
 
 export const YgoCard: React.FC<YgoCardProps> = ({ card }) => {
@@ -18,7 +15,7 @@ export const YgoCard: React.FC<YgoCardProps> = ({ card }) => {
     async function loadImage() {
       try {
         // 1. Check DB for existing URL
-        const { data, error: dbError } = await supabase
+        const { data } = await supabase
           .from('cards')
           .select('local_image_url')
           .eq('id', card.id)
