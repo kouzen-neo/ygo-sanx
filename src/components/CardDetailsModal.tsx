@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, IconButton, Typography, Box, Grid2, Chip, Divider, Skeleton } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, IconButton, Typography, Box, Grid, Chip, Divider, Skeleton } from '@mui/material';
 import { X } from 'lucide-react';
 import type { YgoCardData } from '../types';
 import { supabase } from '../supabaseClient';
@@ -27,7 +27,17 @@ export const CardDetailsModal: React.FC<CardDetailsModalProps> = ({ card, onClos
   if (!card) return null;
 
   return (
-    <Dialog open={!!card} onClose={onClose} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: 'background.default', backgroundImage: 'none' } }}>
+    <Dialog 
+      open={!!card} 
+      onClose={onClose} 
+      maxWidth="md" 
+      fullWidth 
+      slotProps={{ 
+        paper: { 
+          sx: { bgcolor: 'background.default', backgroundImage: 'none' } 
+        } 
+      }}
+    >
       <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h6" component="div">{card.name}</Typography>
         <IconButton aria-label="close" onClick={onClose} sx={{ color: 'text.secondary' }}>
@@ -35,8 +45,8 @@ export const CardDetailsModal: React.FC<CardDetailsModalProps> = ({ card, onClos
         </IconButton>
       </DialogTitle>
       <DialogContent dividers sx={{ p: { xs: 2, md: 4 } }}>
-        <Grid2 container spacing={4}>
-          <Grid2 size={{ xs: 12, md: 5 }}>
+        <Grid container spacing={4}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
               {localUrl ? (
                 <img src={localUrl} alt={card.name} style={{ maxWidth: '100%', maxHeight: '500px', objectFit: 'contain', borderRadius: '8px' }} />
@@ -44,8 +54,8 @@ export const CardDetailsModal: React.FC<CardDetailsModalProps> = ({ card, onClos
                 <Skeleton variant="rectangular" width={300} height={430} sx={{ borderRadius: 2 }} />
               )}
             </Box>
-          </Grid2>
-          <Grid2 size={{ xs: 12, md: 7 }}>
+          </Grid>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
               <Chip label={card.type} color="primary" variant="outlined" />
               <Chip label={card.race} color="secondary" variant="outlined" />
@@ -75,8 +85,8 @@ export const CardDetailsModal: React.FC<CardDetailsModalProps> = ({ card, onClos
                 </Box>
               </>
             )}
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
       </DialogContent>
     </Dialog>
   );
